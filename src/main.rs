@@ -1,11 +1,7 @@
-#![deny(
-    future_incompatible,
-    nonstandard_style,
-    unsafe_code,
-    rust_2018_idioms,
-    private_in_public,
-    unused_results
-)]
-#![warn(clippy::pedantic)]
+mod nu;
 
-fn main() {}
+use nu_plugin::{serve_plugin, MsgPackSerializer};
+
+fn main() {
+    serve_plugin(&mut nu::Plugin, MsgPackSerializer {})
+}

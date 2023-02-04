@@ -6,6 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+defaults:
+  run:
+    shell: nu {0}
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -19,6 +23,7 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-hack@0.5,just@1,cargo-msrv@0.15,cargo-deny@0.13
+      - uses: hustcer/setup-nu@v3
       - run: just verify
   lint:
     runs-on: ubuntu-latest
@@ -35,5 +40,6 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-hack,just,cargo-deny
-      - run: just lint doc
+      - uses: hustcer/setup-nu@v3
+      - run: just lint
       - run: cargo deny check

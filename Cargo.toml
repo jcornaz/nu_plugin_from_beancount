@@ -1,9 +1,9 @@
 [package]
-name = "nu-from-beancount"
+name = "nu_plugin_from_beancount"
 version = "0.0.0"
 license = "Unlicense"
 authors = ["Jonathan Cornaz"]
-repository = "https://github.com/jcornaz/nu-from-beancount"
+repository = "https://github.com/jcornaz/nu_plugin_from_beancount"
 edition = "2021"
 rust-version = "1.62"
 description = "A nushell extension to load a beancount file into nu structured data"
@@ -11,15 +11,5 @@ categories = []
 keywords = []
 
 [dependencies]
-nu-plugin = { version = "0.75.0", default-features = false }
-nu-protocol = { version = "0.75.0", default-features = false, features = ["plugin"] }
-
-[dev-dependencies]
-
-[profile.dev]
-opt-level = 1
-debug = false
-
-[profile.release]
-lto = true
-codegen-units = 1
+nu-plugin = { version = "0.75", default-features = false }
+nu-protocol = { version = "0.75", default-features = false, features = ["plugin"] }

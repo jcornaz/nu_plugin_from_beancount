@@ -1,15 +1,18 @@
 set dotenv-load
+set shell := ["nu", "-c"]
 
 @_choose:
-	just --choose --unsorted
+	just --list --unsorted
 
 # Perform all verifications (compile, test, lint, etc.)
-verify: test doc check-msrv lint
-	cargo deny check licenses
+verify: test && check-msrv lint
+	cargo build --release
+	register ./target/release/nu_plugin_from_beancount
+	from beancount
 
 # Watch the source files and run `just verify` when source changes
 watch:
-	cargo watch --delay 0.1 --clear --why -- just verify && cargo deny check
+	cargo watch --delay 0.1 --clear --why -s 'just verify' -s 'cargo deny check'
 
 # Run the tests
 test:
@@ -19,13 +22,7 @@ test:
 lint:
 	cargo fmt -- --check
 	cargo hack clippy --feature-powerset --all-targets --optional-deps
-
-# Build the documentation
-doc *args:
-	cargo doc --all-features --no-deps {{args}}
-
-# Open the documentation page
-doc-open: (doc "--open")
+	cargo deny check licenses
 
 # Make sure the MSRV is satisfiable
 check-msrv:
