@@ -1,0 +1,23 @@
+[advisories]
+vulnerability = "deny"
+unmaintained = "deny"
+yanked = "deny"
+notice = "deny"
+ignore = []
+
+[licenses]
+default = "deny"
+unlicensed = "deny"
+copyleft = "deny"
+allow = [
+  "Unlicense",
+  "MIT",
+  "Apache-2.0",
+  "Unicode-DFS-2016",
+  "ISC",
+  "CC-PDDC",
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
