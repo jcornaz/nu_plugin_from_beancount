@@ -3,7 +3,16 @@ vulnerability = "deny"
 unmaintained = "deny"
 yanked = "deny"
 notice = "deny"
-ignore = []
+ignore = [
+  # `time` has been removed from 'chrono' (needed by nu-protocol), waiting for chrono 0.4.24+ to be released.
+  # see: https://github.com/chronotope/chrono/issues/602 (vulnerability report to chrono)
+  # see: https://github.com/chronotope/chrono/issues/929 (next release planning)
+  "RUSTSEC-2020-0071",
+  # Required by miette, which is required by nu-protocl
+  # No update is available
+  # Shouldn't be exploitable in practice, as we don't use a custom global allocator
+  "RUSTSEC-2021-0145",
+]
 
 [licenses]
 default = "deny"
@@ -21,3 +30,6 @@ allow = [
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
+
+[bans]
+multiple-versions = "allow"
