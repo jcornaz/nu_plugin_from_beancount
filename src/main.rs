@@ -62,31 +62,28 @@ mod tests {
     }
 
     #[rstest]
-    fn should_be_successful(#[values("", BEAN_EXAMPLE)] input: &str, mut plugin: impl Plugin) {
-        let result = plugin.run(
+    fn should_be_successful(#[values("", BEAN_EXAMPLE)] input: &str) {
+        let result = from_beancount(input);
+        assert!(result.is_ok(), "{result:?}");
+    }
+
+    #[rstest]
+    fn should_return_empty_list_for_empty_input() {
+        let result = from_beancount("");
+        let Ok(Value::List { vals, .. }) = result else {
+            panic!("Expected a list value but was: {result:?}");
+        };
+        assert!(vals.is_empty());
+    }
+
+    fn from_beancount(input: &str) -> Result<Value, LabeledError> {
+        plugin().run(
             "from beancount",
             &SIMPLE_CALL,
             &Value::String {
                 val: input.into(),
                 span: Span::unknown(),
             },
-        );
-        assert!(result.is_ok(), "{result:?}");
-    }
-
-    #[rstest]
-    fn should_return_empty_list_for_empty_input(mut plugin: impl Plugin) {
-        let result = plugin.run(
-            "from beancount",
-            &SIMPLE_CALL,
-            &Value::String {
-                val: "".into(),
-                span: Span::unknown(),
-            },
-        );
-        let Ok(Value::List { vals, .. }) = result else {
-            panic!("Expected a list value but was: {result:?}");
-        };
-        assert!(vals.is_empty());
+        )
     }
 }
