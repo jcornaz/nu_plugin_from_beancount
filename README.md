@@ -12,12 +12,12 @@ data that could be further transformed and manipulated by the user.
 ## Supported Beancount syntax
 
 * [ ] Transaction
-  * [ ] Flag
-  * [ ] Date
-  * [ ] Payee
-  * [ ] Narration
-  * [ ] Postings
-    * [ ] Account
+  * [x] Flag
+  * [x] Date
+  * [x] Payee
+  * [x] Narration
+  * [x] Postings
+    * [x] Account
     * [ ] Amount
 * [ ] Include directive
 * [ ] Pad directive
