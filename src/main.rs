@@ -2,7 +2,8 @@
 #[macro_use]
 extern crate rstest;
 
-use beancount_parser::{Directive, Parser};
+use beancount_parser::{Date, Directive, Parser};
+use chrono::{FixedOffset, NaiveDate, NaiveTime, TimeZone};
 use nu_plugin::{EvaluatedCall, LabeledError};
 use nu_protocol::{Category, Signature, Span, Spanned, Value};
 
@@ -52,9 +53,15 @@ impl nu_plugin::Plugin for NuPlugin {
 fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
     if let Directive::Transaction(trx) = directive {
         Some(Value::record(
-            vec!["directive_type".into(), "payee".into(), "narration".into()],
+            vec![
+                "directive_type".into(),
+                "date".into(),
+                "payee".into(),
+                "narration".into(),
+            ],
             vec![
                 Value::string("txn", span),
+                into_date(trx.date(), span),
                 trx.payee()
                     .map(|n| Value::string(n, span))
                     .unwrap_or_default(),
@@ -69,8 +76,26 @@ fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
     }
 }
 
+fn into_date(date: Date, span: Span) -> Value {
+    let naive = NaiveDate::from_ymd_opt(
+        date.year() as i32,
+        date.month_of_year() as u32,
+        date.day_of_month() as u32,
+    )
+    .expect("The date given by the beancount-parser should be valid")
+    .and_time(NaiveTime::default());
+
+    let val = FixedOffset::east_opt(0)
+        .unwrap()
+        .from_local_datetime(&naive)
+        .unwrap();
+
+    Value::Date { val, span }
+}
+
 #[cfg(test)]
 mod tests {
+    use chrono::NaiveDate;
     use nu_plugin::Plugin;
     use nu_protocol::Span;
 
@@ -157,6 +182,18 @@ mod tests {
                 .unwrap(),
             "Groceries"
         );
+    }
+
+    #[rstest]
+    fn should_return_date(#[values(r#"2022-02-05 txn"#)] input: &str) {
+        let output = from_beancount(input).unwrap();
+        let directives = output.as_list().unwrap();
+        assert_eq!(directives.len(), 1);
+        let Value::Date { val, .. } = &directives[0].get_data_by_key("date").unwrap() else { 
+            panic!("was not a date");
+        };
+        let expected = NaiveDate::from_ymd_opt(2022, 2, 5).unwrap();
+        assert_eq!(val.date_naive(), expected);
     }
 
     fn from_beancount(input: &str) -> Result<Value, LabeledError> {

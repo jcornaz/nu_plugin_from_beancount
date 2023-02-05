@@ -14,7 +14,7 @@ keywords = []
 beancount-parser = { version = "1", default-features = false }
 nu-plugin = { version = "0.75", default-features = false }
 nu-protocol = { version = "0.75", default-features = false, features = ["plugin"] }
+chrono = { version = "0.4", default-features = false, features = ["std"] }
 
 [dev-dependencies]
-anyhow = { version = "1", default-features = false, features = ["std"] }
 rstest = { version = "0.16", default-features = false }
