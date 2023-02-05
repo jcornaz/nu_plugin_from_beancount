@@ -59,6 +59,7 @@ fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
                 "flag".into(),
                 "payee".into(),
                 "narration".into(),
+                "postings".into(),
             ],
             vec![
                 into_date(trx.date(), span),
@@ -70,6 +71,13 @@ fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
                 trx.narration()
                     .map(|d| Value::string(d, span))
                     .unwrap_or_default(),
+                Value::list(
+                    trx.postings()
+                        .iter()
+                        .map(|_| Value::nothing(span))
+                        .collect(),
+                    span,
+                ),
             ],
             span,
         ))
@@ -225,6 +233,20 @@ mod tests {
         };
         let expected = NaiveDate::from_ymd_opt(2022, 2, 5).unwrap();
         assert_eq!(val.date_naive(), expected);
+    }
+
+    #[rstest]
+    fn should_return_posings_in_transaction() {
+        let input = r#"
+2022-02-05 * "Groceries Store" "Groceries"
+    Expenses:Food    10 CHF
+    Assets:Cash
+        "#;
+        let output = from_beancount(input).unwrap();
+        let trx = &output.as_list().unwrap()[0];
+        let postings = trx.get_data_by_key("postings").unwrap();
+        let posting_list = postings.as_list().unwrap();
+        assert_eq!(posting_list.len(), 2);
     }
 
     fn from_beancount(input: &str) -> Result<Value, LabeledError> {
