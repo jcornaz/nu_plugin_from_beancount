@@ -46,6 +46,8 @@ mod tests {
         named: Vec::new(),
     };
 
+    const BEAN_EXAMPLE: &str = include_str!("example.beancount");
+
     #[fixture]
     fn plugin() -> impl Plugin {
         NuPlugin
@@ -57,6 +59,19 @@ mod tests {
             .signature()
             .into_iter()
             .any(|s| &s.name == "from beancount"));
+    }
+
+    #[rstest]
+    fn should_be_successful(#[values("", BEAN_EXAMPLE)] input: &str, mut plugin: impl Plugin) {
+        let result = plugin.run(
+            "from beancount",
+            &SIMPLE_CALL,
+            &Value::String {
+                val: input.into(),
+                span: Span::unknown(),
+            },
+        );
+        assert!(result.is_ok(), "{result:?}");
     }
 
     #[rstest]
