@@ -1,0 +1,140 @@
+use beancount_parser::{transaction::Flag, Date, Transaction};
+use chrono::{FixedOffset, NaiveDate, NaiveTime, TimeZone};
+use nu_protocol::{Span, Value};
+
+pub fn record(trx: Transaction<'_>, span: Span) -> Value {
+    Value::record(
+        vec![
+            "date".into(),
+            "directive_type".into(),
+            "flag".into(),
+            "payee".into(),
+            "narration".into(),
+            "postings".into(),
+        ],
+        vec![
+            date(trx.date(), span),
+            Value::string("txn", span),
+            flag(trx.flag(), span),
+            trx.payee()
+                .map(|n| Value::string(n, span))
+                .unwrap_or_default(),
+            trx.narration()
+                .map(|d| Value::string(d, span))
+                .unwrap_or_default(),
+            Value::list(
+                trx.postings()
+                    .iter()
+                    .map(|_| Value::nothing(span))
+                    .collect(),
+                span,
+            ),
+        ],
+        span,
+    )
+}
+
+fn flag(flag: Option<Flag>, span: Span) -> Value {
+    Value::string(
+        match flag {
+            Some(Flag::Cleared) | None => "*",
+            Some(Flag::Pending) => "!",
+        },
+        span,
+    )
+}
+
+fn date(date: Date, span: Span) -> Value {
+    let naive = NaiveDate::from_ymd_opt(
+        date.year() as i32,
+        date.month_of_year() as u32,
+        date.day_of_month() as u32,
+    )
+    .expect("The date given by the beancount-parser should be valid")
+    .and_time(NaiveTime::default());
+
+    let val = FixedOffset::east_opt(0)
+        .unwrap()
+        .from_local_datetime(&naive)
+        .unwrap();
+
+    Value::Date { val, span }
+}
+
+#[cfg(test)]
+mod tests {
+    use beancount_parser::{Directive, Parser};
+    use chrono::NaiveDate;
+
+    use super::*;
+
+    fn input_trx(raw: &str) -> Transaction<'_> {
+        Parser::new(raw)
+            .filter_map(Result::ok)
+            .find_map(Directive::into_transaction)
+            .unwrap()
+    }
+
+    fn parse(raw: &str) -> Value {
+        record(input_trx(raw), Span::unknown())
+    }
+
+    #[rstest]
+    fn should_return_type_payee_and_narration() {
+        let input = r#"2022-02-05 * "Groceries Store" "Groceries""#;
+        let trx = parse(input);
+        assert_eq!(
+            trx.get_data_by_key("directive_type")
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "txn"
+        );
+        assert_eq!(
+            trx.get_data_by_key("payee").unwrap().as_string().unwrap(),
+            "Groceries Store"
+        );
+        assert_eq!(
+            trx.get_data_by_key("narration")
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "Groceries"
+        );
+    }
+
+    #[rstest]
+    #[case("2022-02-05 *", "*")]
+    #[case("2022-02-05 !", "!")]
+    #[case("2022-02-05 txn", "*")]
+    fn should_return_expected_transaction_flag(#[case] input: &str, #[case] expected_flag: &str) {
+        let trx = parse(input);
+        assert_eq!(
+            trx.get_data_by_key("flag").unwrap().as_string().unwrap(),
+            expected_flag
+        );
+    }
+
+    #[rstest]
+    fn should_return_date(#[values(r#"2022-02-05 txn"#)] input: &str) {
+        let trx = parse(input);
+        let Value::Date { val, .. } = &trx.get_data_by_key("date").unwrap() else { 
+            panic!("was not a date");
+        };
+        let expected = NaiveDate::from_ymd_opt(2022, 2, 5).unwrap();
+        assert_eq!(val.date_naive(), expected);
+    }
+
+    #[rstest]
+    fn should_return_posings_in_transaction() {
+        let input = r#"
+2022-02-05 * "Groceries Store" "Groceries"
+    Expenses:Food    10 CHF
+    Assets:Cash
+        "#;
+        let trx = parse(input);
+        let postings = trx.get_data_by_key("postings").unwrap();
+        let posting_list = postings.as_list().unwrap();
+        assert_eq!(posting_list.len(), 2);
+    }
+}

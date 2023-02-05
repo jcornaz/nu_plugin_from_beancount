@@ -2,8 +2,9 @@
 #[macro_use]
 extern crate rstest;
 
-use beancount_parser::{transaction::Flag, Date, Directive, Parser};
-use chrono::{FixedOffset, NaiveDate, NaiveTime, TimeZone};
+mod transaction;
+
+use beancount_parser::{Directive, Parser};
 use nu_plugin::{EvaluatedCall, LabeledError};
 use nu_protocol::{Category, Signature, Span, Spanned, Type, Value};
 
@@ -36,7 +37,7 @@ impl nu_plugin::Plugin for NuPlugin {
         } = input.as_spanned_string()?;
         let vals = Parser::new(&input)
             .filter_map(|directive| match directive {
-                Ok(directive) => into_record(directive, input_span).map(Ok),
+                Ok(directive) => record(directive, input_span).map(Ok),
                 Err(err) => Some(Err(err)),
             })
             .collect::<Result<Vec<Value>, _>>()
@@ -52,71 +53,17 @@ impl nu_plugin::Plugin for NuPlugin {
     }
 }
 
-fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
+pub fn record(directive: Directive<'_>, span: Span) -> Option<Value> {
     if let Directive::Transaction(trx) = directive {
-        Some(Value::record(
-            vec![
-                "date".into(),
-                "directive_type".into(),
-                "flag".into(),
-                "payee".into(),
-                "narration".into(),
-                "postings".into(),
-            ],
-            vec![
-                into_date(trx.date(), span),
-                Value::string("txn", span),
-                flag(trx.flag(), span),
-                trx.payee()
-                    .map(|n| Value::string(n, span))
-                    .unwrap_or_default(),
-                trx.narration()
-                    .map(|d| Value::string(d, span))
-                    .unwrap_or_default(),
-                Value::list(
-                    trx.postings()
-                        .iter()
-                        .map(|_| Value::nothing(span))
-                        .collect(),
-                    span,
-                ),
-            ],
-            span,
-        ))
+        Some(transaction::record(trx, span))
     } else {
         None
     }
 }
 
-fn flag(flag: Option<Flag>, span: Span) -> Value {
-    Value::string(
-        match flag {
-            Some(Flag::Cleared) | None => "*",
-            Some(Flag::Pending) => "!",
-        },
-        span,
-    )
-}
-
-fn into_date(date: Date, span: Span) -> Value {
-    let naive = NaiveDate::from_ymd_opt(
-        date.year() as i32,
-        date.month_of_year() as u32,
-        date.day_of_month() as u32,
-    )
-    .expect("The date given by the beancount-parser should be valid")
-    .and_time(NaiveTime::default());
-
-    let val = FixedOffset::east_opt(0)
-        .unwrap()
-        .from_local_datetime(&naive)
-        .unwrap();
-
-    Value::Date { val, span }
-}
-
 #[cfg(test)]
 mod tests {
+    use chrono::NaiveDate;
     use nu_plugin::Plugin;
 
     use super::*;
@@ -208,25 +155,6 @@ mod tests {
     }
 
     #[rstest]
-    #[case("2022-02-05 *", "*")]
-    #[case("2022-02-05 !", "!")]
-    #[case("2022-02-05 txn", "*")]
-    fn should_return_expected_transaction_flag(#[case] input: &str, #[case] expected_flag: &str) {
-        let output = from_beancount(input).unwrap();
-        let directives = output.as_list().unwrap();
-        assert_eq!(directives.len(), 1);
-        let directive = &directives[0];
-        assert_eq!(
-            directive
-                .get_data_by_key("flag")
-                .unwrap()
-                .as_string()
-                .unwrap(),
-            expected_flag
-        );
-    }
-
-    #[rstest]
     fn should_return_date(#[values(r#"2022-02-05 txn"#)] input: &str) {
         let output = from_beancount(input).unwrap();
         let directives = output.as_list().unwrap();
@@ -236,20 +164,6 @@ mod tests {
         };
         let expected = NaiveDate::from_ymd_opt(2022, 2, 5).unwrap();
         assert_eq!(val.date_naive(), expected);
-    }
-
-    #[rstest]
-    fn should_return_posings_in_transaction() {
-        let input = r#"
-2022-02-05 * "Groceries Store" "Groceries"
-    Expenses:Food    10 CHF
-    Assets:Cash
-        "#;
-        let output = from_beancount(input).unwrap();
-        let trx = &output.as_list().unwrap()[0];
-        let postings = trx.get_data_by_key("postings").unwrap();
-        let posting_list = postings.as_list().unwrap();
-        assert_eq!(posting_list.len(), 2);
     }
 
     fn from_beancount(input: &str) -> Result<Value, LabeledError> {
