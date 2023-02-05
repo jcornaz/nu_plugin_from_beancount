@@ -34,7 +34,10 @@ impl nu_plugin::Plugin for NuPlugin {
             span: input_span,
         } = input.as_spanned_string()?;
         let vals = Parser::new(&input)
-            .map(|directive| directive.map(|d| into_record(d, call.head)))
+            .filter_map(|directive| match directive {
+                Ok(directive) => into_record(directive, input_span).map(Ok),
+                Err(err) => Some(Err(err)),
+            })
             .collect::<Result<Vec<Value>, _>>()
             .map_err(|err| LabeledError {
                 label: "Invalid beancount input".into(),
@@ -52,12 +55,14 @@ mod field {
     pub(super) const DIRECTIVE_TYPE: &str = "directive_type";
 }
 
-fn into_record(directive: Directive<'_>, span: Span) -> Value {
+fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
     let mut map = HashMap::with_capacity(1);
     if let Directive::Transaction(_) = directive {
         map.insert(field::DIRECTIVE_TYPE.into(), Value::string("txn", span));
+        Some(Value::record_from_hashmap(&map, span))
+    } else {
+        None
     }
-    Value::record_from_hashmap(&map, span)
 }
 
 #[cfg(test)]
@@ -92,6 +97,16 @@ mod tests {
     fn should_be_successful(#[values("", BEAN_EXAMPLE)] input: &str) {
         let result = from_beancount(input);
         assert!(result.is_ok(), "{result:?}");
+    }
+
+    #[rstest]
+    fn all_row_should_have_directive_type(#[values("", BEAN_EXAMPLE)] input: &str) {
+        let output = from_beancount(input).unwrap();
+        assert!(output
+            .as_list()
+            .unwrap()
+            .iter()
+            .all(|row| { row.get_data_by_key("directive_type").is_some() }));
     }
 
     #[rstest]
