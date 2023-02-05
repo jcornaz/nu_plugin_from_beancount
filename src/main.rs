@@ -1,3 +1,7 @@
+#[cfg(test)]
+#[macro_use]
+extern crate rstest;
+
 use nu_plugin::{EvaluatedCall, LabeledError};
 use nu_protocol::{Category, Signature, Value};
 
@@ -23,5 +27,25 @@ impl nu_plugin::Plugin for NuPlugin {
         _input: &Value,
     ) -> Result<Value, LabeledError> {
         Ok(Value::Nothing { span: call.head })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use nu_plugin::Plugin;
+
+    use super::*;
+
+    #[fixture]
+    fn plugin() -> impl Plugin {
+        NuPlugin
+    }
+
+    #[rstest]
+    fn should_have_from_beancount_signature(plugin: impl Plugin) {
+        assert!(plugin
+            .signature()
+            .into_iter()
+            .any(|s| &s.name == "from beancount"));
     }
 }
