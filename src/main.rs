@@ -2,8 +2,6 @@
 #[macro_use]
 extern crate rstest;
 
-use std::collections::HashMap;
-
 use beancount_parser::{Directive, Parser};
 use nu_plugin::{EvaluatedCall, LabeledError};
 use nu_protocol::{Category, Signature, Span, Spanned, Value};
@@ -51,29 +49,21 @@ impl nu_plugin::Plugin for NuPlugin {
     }
 }
 
-mod field {
-    pub(super) const DIRECTIVE_TYPE: &str = "directive_type";
-    pub(super) const PAYEE: &str = "payee";
-    pub(super) const NARRATION: &str = "narration";
-}
-
 fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
-    let mut map = HashMap::with_capacity(1);
     if let Directive::Transaction(trx) = directive {
-        map.insert(field::DIRECTIVE_TYPE.into(), Value::string("txn", span));
-        map.insert(
-            field::PAYEE.into(),
-            trx.payee()
-                .map(|n| Value::string(n, span))
-                .unwrap_or_default(),
-        );
-        map.insert(
-            field::NARRATION.into(),
-            trx.narration()
-                .map(|d| Value::string(d, span))
-                .unwrap_or_default(),
-        );
-        Some(Value::record_from_hashmap(&map, span))
+        Some(Value::record(
+            vec!["directive_type".into(), "payee".into(), "narration".into()],
+            vec![
+                Value::string("txn", span),
+                trx.payee()
+                    .map(|n| Value::string(n, span))
+                    .unwrap_or_default(),
+                trx.narration()
+                    .map(|d| Value::string(d, span))
+                    .unwrap_or_default(),
+            ],
+            span,
+        ))
     } else {
         None
     }
