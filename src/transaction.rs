@@ -1,4 +1,7 @@
-use beancount_parser::{transaction::Flag, Date, Transaction};
+use beancount_parser::{
+    transaction::{Flag, Posting},
+    Date, Transaction,
+};
 use chrono::{FixedOffset, NaiveDate, NaiveTime, TimeZone};
 use nu_protocol::{Span, Value};
 
@@ -23,13 +26,18 @@ pub fn record(trx: Transaction<'_>, span: Span) -> Value {
                 .map(|d| Value::string(d, span))
                 .unwrap_or_default(),
             Value::list(
-                trx.postings()
-                    .iter()
-                    .map(|_| Value::nothing(span))
-                    .collect(),
+                trx.postings().iter().map(|p| posting(p, span)).collect(),
                 span,
             ),
         ],
+        span,
+    )
+}
+
+fn posting(posting: &Posting<'_>, span: Span) -> Value {
+    Value::record(
+        vec!["account".into()],
+        vec![Value::string(posting.account().to_string(), span)],
         span,
     )
 }
@@ -136,5 +144,21 @@ mod tests {
         let postings = trx.get_data_by_key("postings").unwrap();
         let posting_list = postings.as_list().unwrap();
         assert_eq!(posting_list.len(), 2);
+        assert_eq!(
+            &posting_list[0]
+                .get_data_by_key("account")
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "Expenses:Food"
+        );
+        assert_eq!(
+            &posting_list[1]
+                .get_data_by_key("account")
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "Assets:Cash"
+        );
     }
 }
