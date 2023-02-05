@@ -42,8 +42,7 @@ install-dev-tools:
 
 # Install a git hook to run tests before every commits
 install-git-hooks:
-	echo '#!/usr/bin/env sh' > .git/hooks/pre-commit
-	echo 'just verify' >> .git/hooks/pre-commit
+	"#!/usr/bin/env sh\njust verify" | save .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
 
 # run the release process in dry run mode (requires npm and a `GITHUB_TOKEN`)
