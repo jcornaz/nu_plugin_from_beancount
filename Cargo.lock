@@ -73,9 +73,9 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "beancount-parser"
-version = "1.11.1"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf4bd4ebd3a1513f48c2a374f09f09efc85fc2d9d236fac7da363990947b89a1"
+checksum = "20cd4b094e42006c0e48c65eaa6c9681f86efa40669f3f1d6302c2657ff41c45"
 dependencies = [
  "nom",
  "rust_decimal",
