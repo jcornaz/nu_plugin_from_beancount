@@ -2,8 +2,11 @@
 #[macro_use]
 extern crate rstest;
 
+use std::collections::HashMap;
+
+use beancount_parser::{Directive, Parser};
 use nu_plugin::{EvaluatedCall, LabeledError};
-use nu_protocol::{Category, Signature, Value};
+use nu_protocol::{Category, Signature, Span, Spanned, Value};
 
 use nu_plugin::{serve_plugin, MsgPackSerializer};
 
@@ -24,13 +27,37 @@ impl nu_plugin::Plugin for NuPlugin {
         &mut self,
         _name: &str,
         call: &EvaluatedCall,
-        _input: &Value,
+        input: &Value,
     ) -> Result<Value, LabeledError> {
+        let Spanned {
+            item: input,
+            span: input_span,
+        } = input.as_spanned_string()?;
+        let vals = Parser::new(&input)
+            .map(|directive| directive.map(|d| into_record(d, call.head)))
+            .collect::<Result<Vec<Value>, _>>()
+            .map_err(|err| LabeledError {
+                label: "Invalid beancount input".into(),
+                msg: format!("Error while parsing beancount file: {err:?}"),
+                span: Some(input_span),
+            })?;
         Ok(Value::List {
-            vals: Vec::new(),
+            vals,
             span: call.head,
         })
     }
+}
+
+mod field {
+    pub(super) const DIRECTIVE_TYPE: &str = "directive_type";
+}
+
+fn into_record(directive: Directive<'_>, span: Span) -> Value {
+    let mut map = HashMap::with_capacity(1);
+    if let Directive::Transaction(_) = directive {
+        map.insert(field::DIRECTIVE_TYPE.into(), Value::string("txn", span));
+    }
+    Value::record_from_hashmap(&map, span)
 }
 
 #[cfg(test)]
@@ -76,14 +103,25 @@ mod tests {
         assert!(vals.is_empty());
     }
 
+    #[rstest]
+    fn should_return_transaction() {
+        let input = r#"
+2022-02-05 * "Groceries"
+    Expenses:Food    10 CHF
+    Assets:Cash
+        "#;
+        let output = from_beancount(input).unwrap();
+        let directives = output.as_list().unwrap();
+        assert_eq!(directives.len(), 1);
+        let type_ = directives[0]
+            .get_data_by_key("directive_type")
+            .expect("'directive_type' not found")
+            .as_string()
+            .unwrap();
+        assert_eq!(type_, "txn");
+    }
+
     fn from_beancount(input: &str) -> Result<Value, LabeledError> {
-        plugin().run(
-            "from beancount",
-            &SIMPLE_CALL,
-            &Value::String {
-                val: input.into(),
-                span: Span::unknown(),
-            },
-        )
+        plugin().run("from beancount", &SIMPLE_CALL, &Value::test_string(input))
     }
 }

@@ -6,9 +6,6 @@ set shell := ["nu", "-c"]
 
 # Perform all verifications (compile, test, lint, etc.)
 verify: test && check-msrv lint
-	cargo build --release
-	register ./target/release/nu_plugin_from_beancount
-	from beancount
 
 # Watch the source files and run `just verify` when source changes
 watch:
