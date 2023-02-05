@@ -5,7 +5,7 @@ extern crate rstest;
 use beancount_parser::{transaction::Flag, Date, Directive, Parser};
 use chrono::{FixedOffset, NaiveDate, NaiveTime, TimeZone};
 use nu_plugin::{EvaluatedCall, LabeledError};
-use nu_protocol::{Category, Signature, Span, Spanned, Value};
+use nu_protocol::{Category, Signature, Span, Spanned, Type, Value};
 
 use nu_plugin::{serve_plugin, MsgPackSerializer};
 
@@ -19,6 +19,8 @@ impl nu_plugin::Plugin for NuPlugin {
     fn signature(&self) -> Vec<Signature> {
         vec![Signature::build("from beancount")
             .usage("Convert from beancount to structured data")
+            .input_type(Type::String)
+            .output_type(Type::List(Type::Any.into()))
             .category(Category::Formats)]
     }
 
@@ -115,9 +117,7 @@ fn into_date(date: Date, span: Span) -> Value {
 
 #[cfg(test)]
 mod tests {
-    use chrono::NaiveDate;
     use nu_plugin::Plugin;
-    use nu_protocol::Span;
 
     use super::*;
 
@@ -136,10 +136,13 @@ mod tests {
 
     #[rstest]
     fn should_have_from_beancount_command(plugin: impl Plugin) {
-        assert!(plugin
+        let signature = plugin
             .signature()
             .into_iter()
-            .any(|s| &s.name == "from beancount"));
+            .find(|s| &s.name == "from beancount")
+            .unwrap();
+        assert_eq!(signature.input_type, Type::String);
+        assert_eq!(signature.output_type, Type::List(Type::Any.into()));
     }
 
     #[rstest]
