@@ -11,6 +11,7 @@ categories = []
 keywords = []
 
 [dependencies]
+beancount-parser = { version = "1", default-features = false }
 nu-plugin = { version = "0.75", default-features = false }
 nu-protocol = { version = "0.75", default-features = false, features = ["plugin"] }
 
