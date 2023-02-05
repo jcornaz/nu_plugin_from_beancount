@@ -2,7 +2,7 @@
 #[macro_use]
 extern crate rstest;
 
-use beancount_parser::{Date, Directive, Parser};
+use beancount_parser::{transaction::Flag, Date, Directive, Parser};
 use chrono::{FixedOffset, NaiveDate, NaiveTime, TimeZone};
 use nu_plugin::{EvaluatedCall, LabeledError};
 use nu_protocol::{Category, Signature, Span, Spanned, Value};
@@ -54,14 +54,16 @@ fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
     if let Directive::Transaction(trx) = directive {
         Some(Value::record(
             vec![
-                "directive_type".into(),
                 "date".into(),
+                "directive_type".into(),
+                "flag".into(),
                 "payee".into(),
                 "narration".into(),
             ],
             vec![
-                Value::string("txn", span),
                 into_date(trx.date(), span),
+                Value::string("txn", span),
+                flag(trx.flag(), span),
                 trx.payee()
                     .map(|n| Value::string(n, span))
                     .unwrap_or_default(),
@@ -74,6 +76,16 @@ fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
     } else {
         None
     }
+}
+
+fn flag(flag: Option<Flag>, span: Span) -> Value {
+    Value::string(
+        match flag {
+            Some(Flag::Cleared) | None => "*",
+            Some(Flag::Pending) => "!",
+        },
+        span,
+    )
 }
 
 fn into_date(date: Date, span: Span) -> Value {
@@ -181,6 +193,25 @@ mod tests {
                 .as_string()
                 .unwrap(),
             "Groceries"
+        );
+    }
+
+    #[rstest]
+    #[case("2022-02-05 *", "*")]
+    #[case("2022-02-05 !", "!")]
+    #[case("2022-02-05 txn", "*")]
+    fn should_return_expected_transaction_flag(#[case] input: &str, #[case] expected_flag: &str) {
+        let output = from_beancount(input).unwrap();
+        let directives = output.as_list().unwrap();
+        assert_eq!(directives.len(), 1);
+        let directive = &directives[0];
+        assert_eq!(
+            directive
+                .get_data_by_key("flag")
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            expected_flag
         );
     }
 
