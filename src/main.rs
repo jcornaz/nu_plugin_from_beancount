@@ -53,12 +53,26 @@ impl nu_plugin::Plugin for NuPlugin {
 
 mod field {
     pub(super) const DIRECTIVE_TYPE: &str = "directive_type";
+    pub(super) const PAYEE: &str = "payee";
+    pub(super) const NARRATION: &str = "narration";
 }
 
 fn into_record(directive: Directive<'_>, span: Span) -> Option<Value> {
     let mut map = HashMap::with_capacity(1);
-    if let Directive::Transaction(_) = directive {
+    if let Directive::Transaction(trx) = directive {
         map.insert(field::DIRECTIVE_TYPE.into(), Value::string("txn", span));
+        map.insert(
+            field::PAYEE.into(),
+            trx.payee()
+                .map(|n| Value::string(n, span))
+                .unwrap_or_default(),
+        );
+        map.insert(
+            field::NARRATION.into(),
+            trx.narration()
+                .map(|d| Value::string(d, span))
+                .unwrap_or_default(),
+        );
         Some(Value::record_from_hashmap(&map, span))
     } else {
         None
@@ -121,19 +135,38 @@ mod tests {
     #[rstest]
     fn should_return_transaction() {
         let input = r#"
-2022-02-05 * "Groceries"
+2022-02-05 * "Groceries Store" "Groceries"
     Expenses:Food    10 CHF
     Assets:Cash
         "#;
         let output = from_beancount(input).unwrap();
         let directives = output.as_list().unwrap();
         assert_eq!(directives.len(), 1);
-        let type_ = directives[0]
-            .get_data_by_key("directive_type")
-            .expect("'directive_type' not found")
-            .as_string()
-            .unwrap();
-        assert_eq!(type_, "txn");
+        let directive = &directives[0];
+        assert_eq!(
+            directive
+                .get_data_by_key("directive_type")
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "txn"
+        );
+        assert_eq!(
+            directive
+                .get_data_by_key("payee")
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "Groceries Store"
+        );
+        assert_eq!(
+            directive
+                .get_data_by_key("narration")
+                .unwrap()
+                .as_string()
+                .unwrap(),
+            "Groceries"
+        );
     }
 
     fn from_beancount(input: &str) -> Result<Value, LabeledError> {

@@ -31,6 +31,10 @@ clean:
 	rm -f Cargo.lock
 	rm -rf node_modules
 
+# Install to $CARGO_HOME/bin (But does not register to the plugin nushell)
+install:
+	cargo install --path .
+
 # Install cargo dev-tools used by the `verify` recipe (requires rustup to be already installed)
 install-dev-tools:
 	rustup install stable
