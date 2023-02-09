@@ -1,6 +1,6 @@
 use beancount_parser::{
     transaction::{Flag, Posting},
-    Date, Transaction,
+    Amount, Date, Transaction,
 };
 use chrono::{FixedOffset, NaiveDate, NaiveTime, TimeZone};
 use nu_protocol::{Span, Value};
@@ -36,8 +36,26 @@ pub fn record(trx: Transaction<'_>, span: Span) -> Value {
 
 fn posting(posting: &Posting<'_>, span: Span) -> Value {
     Value::record(
-        vec!["account".into()],
-        vec![Value::string(posting.account().to_string(), span)],
+        vec!["account".into(), "amount".into()],
+        vec![
+            Value::string(posting.account().to_string(), span),
+            posting
+                .amount()
+                .map(|a| amount(a, span))
+                .unwrap_or_default(),
+        ],
+        span,
+    )
+}
+
+fn amount(amount: &Amount<'_>, span: Span) -> Value {
+    Value::record(
+        vec![amount.currency().into()],
+        vec![amount
+            .value()
+            .try_into_f64()
+            .map(|v| Value::float(v, span))
+            .unwrap_or_default()],
         span,
     )
 }
@@ -71,6 +89,7 @@ fn date(date: Date, span: Span) -> Value {
 
 #[cfg(test)]
 mod tests {
+    use approx::assert_ulps_eq;
     use beancount_parser::{Directive, Parser};
     use chrono::NaiveDate;
 
@@ -152,6 +171,10 @@ mod tests {
                 .unwrap(),
             "Expenses:Food"
         );
+        let food_amount = posting_list[0].get_data_by_key("amount").unwrap();
+        let (cols, vals) = food_amount.as_record().unwrap();
+        assert_eq!(cols, &["CHF".to_string()]);
+        assert_ulps_eq!(vals[0].as_float().unwrap(), 10.0);
         assert_eq!(
             &posting_list[1]
                 .get_data_by_key("account")
@@ -160,5 +183,7 @@ mod tests {
                 .unwrap(),
             "Assets:Cash"
         );
+        let cash_amount = &posting_list[1].get_data_by_key("amount").unwrap();
+        assert!(cash_amount.is_nothing());
     }
 }

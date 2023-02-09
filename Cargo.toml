@@ -17,4 +17,5 @@ nu-protocol = { version = "0.75", default-features = false, features = ["plugin"
 chrono = { version = "0.4", default-features = false, features = ["std"] }
 
 [dev-dependencies]
+approx = "0.5"
 rstest = { version = "0.16", default-features = false }
