@@ -9,7 +9,7 @@ pub fn record(trx: Transaction<'_>, span: Span) -> Value {
     Value::record(
         vec![
             "date".into(),
-            "directive_type".into(),
+            "directive".into(),
             "flag".into(),
             "payee".into(),
             "narration".into(),
@@ -111,7 +111,7 @@ mod tests {
         let input = r#"2022-02-05 * "Groceries Store" "Groceries""#;
         let trx = parse(input);
         assert_eq!(
-            trx.get_data_by_key("directive_type")
+            trx.get_data_by_key("directive")
                 .unwrap()
                 .as_string()
                 .unwrap(),

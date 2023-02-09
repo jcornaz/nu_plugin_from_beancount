@@ -102,7 +102,7 @@ mod tests {
             .as_list()
             .unwrap()
             .iter()
-            .all(|row| { row.get_data_by_key("directive_type").is_some() }));
+            .all(|row| { row.get_data_by_key("directive").is_some() }));
     }
 
     #[rstest]
@@ -127,7 +127,7 @@ mod tests {
         let directive = &directives[0];
         assert_eq!(
             directive
-                .get_data_by_key("directive_type")
+                .get_data_by_key("directive")
                 .unwrap()
                 .as_string()
                 .unwrap(),
