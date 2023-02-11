@@ -7,10 +7,35 @@
 
 A nushell extension to load a beancount file into nu structured data.
 
-The idea is that in a [nu] shell one could run `bean-example | from beancount` ot `open myledger.beancount` to get a nushell structured
-table that could be further transformed and manipulated by the user.
+When using [nushell] one could run `bean-example | from beancount` ot `open myledger.beancount` to get a nushell structured
+table that can be further transformed and manipulated by the user.
 
-[nu]: https://www.nushell.sh/
+[nushell]: https://www.nushell.sh/
+
+
+## Example
+
+```nu
+> bean-example | from beancount | where direcive == txn | take 1
+╭───┬─────────────┬───────────┬──────┬───────┬──────────────────────────────────────┬────────────────────────────────────────────────────╮
+│ # │    date     │ directive │ flag │ payee │              narration               │                      postings                      │
+├───┼─────────────┼───────────┼──────┼───────┼──────────────────────────────────────┼────────────────────────────────────────────────────┤
+│ 0 │ 2 years ago │ txn       │ *    │       │ Opening Balance for checking account │ ╭───┬─────────────────────────┬──────────────────╮ │
+│   │             │           │      │       │                                      │ │ # │         account         │      amount      │ │
+│   │             │           │      │       │                                      │ ├───┼─────────────────────────┼──────────────────┤ │
+│   │             │           │      │       │                                      │ │ 0 │ Assets:US:BofA:Checking │ ╭───┬─────────╮  │ │
+│   │             │           │      │       │                                      │ │   │                         │ │ # │   USD   │  │ │
+│   │             │           │      │       │                                      │ │   │                         │ ├───┼─────────┤  │ │
+│   │             │           │      │       │                                      │ │   │                         │ │ 0 │ 4560.14 │  │ │
+│   │             │           │      │       │                                      │ │   │                         │ ╰───┴─────────╯  │ │
+│   │             │           │      │       │                                      │ │ 1 │ Equity:Opening-Balances │ ╭───┬──────────╮ │ │
+│   │             │           │      │       │                                      │ │   │                         │ │ # │   USD    │ │ │
+│   │             │           │      │       │                                      │ │   │                         │ ├───┼──────────┤ │ │
+│   │             │           │      │       │                                      │ │   │                         │ │ 0 │ -4560.14 │ │ │
+│   │             │           │      │       │                                      │ │   │                         │ ╰───┴──────────╯ │ │
+│   │             │           │      │       │                                      │ ╰───┴─────────────────────────┴──────────────────╯ │
+╰───┴─────────────┴───────────┴──────┴───────┴──────────────────────────────────────┴────────────────────────────────────────────────────╯
+```
 
 
 ## Supported Beancount syntax
@@ -22,6 +47,14 @@ table that could be further transformed and manipulated by the user.
 * [ ] Balance assertion
 * [ ] Option
 * [ ] ...
+
+
+## Installation
+
+```nu
+cargo install nu_plugin_from_beancount
+register ~/.cargo/bin/nu_plugin_from_beancount
+```
 
 
 ## Unlicense
