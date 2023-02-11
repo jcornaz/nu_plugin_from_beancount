@@ -6,6 +6,7 @@ set shell := ["nu", "-c"]
 
 # Perform all verifications (compile, test, lint, etc.)
 verify: test && check-msrv lint
+	cargo vet
 
 # Watch the source files and run `just verify` when source changes
 watch:
@@ -39,7 +40,7 @@ install:
 install-dev-tools:
 	rustup install stable
 	rustup override set stable
-	cargo install cargo-hack cargo-watch cargo-msrv
+	cargo install cargo-hack cargo-watch cargo-msrv cargo-vet
 
 # Install a git hook to run tests before every commits
 install-git-hooks:
