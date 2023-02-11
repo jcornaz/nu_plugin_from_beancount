@@ -736,7 +736,7 @@ dependencies = [
 
 [[package]]
 name = "nu_plugin_from_beancount"
-version = "0.0.0"
+version = "1.0.0"
 dependencies = [
  "approx",
  "beancount-parser",

@@ -3,7 +3,6 @@
 [![License](https://img.shields.io/crates/l/nu_plugin_from_beancount)](#Unlicense)
 [![Crates.io](https://img.shields.io/crates/v/nu_plugin_from_beancount)](https://crates.io/crates/nu_plugin_from_beancount)
 ![rustc](https://img.shields.io/badge/rustc-1.62+-blue?logo=rust)
-[![Docs](https://docs.rs/nu_plugin_from_beancount/badge.svg)](https://docs.rs/nu_plugin_from_beancount)
 
 A [nushell] extension to load a beancount file into nu structured data.
 
