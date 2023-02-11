@@ -9,7 +9,6 @@ pub(crate) fn record(trx: &Transaction<'_>, span: Span) -> Value {
     Value::record(
         vec![
             "date".into(),
-            "directive".into(),
             "flag".into(),
             "payee".into(),
             "narration".into(),
@@ -17,7 +16,6 @@ pub(crate) fn record(trx: &Transaction<'_>, span: Span) -> Value {
         ],
         vec![
             date(trx.date(), span),
-            Value::string("txn", span),
             flag(trx.flag(), span),
             trx.payee()
                 .map(|n| Value::string(n, span))
@@ -110,13 +108,6 @@ mod tests {
     fn should_return_type_payee_and_narration() {
         let input = r#"2022-02-05 * "Groceries Store" "Groceries""#;
         let trx = parse(input);
-        assert_eq!(
-            trx.get_data_by_key("directive")
-                .unwrap()
-                .as_string()
-                .unwrap(),
-            "txn"
-        );
         assert_eq!(
             trx.get_data_by_key("payee").unwrap().as_string().unwrap(),
             "Groceries Store"
