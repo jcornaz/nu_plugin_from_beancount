@@ -43,6 +43,7 @@ impl nu_plugin::Plugin for NuPlugin {
             item: input,
             span: input_span,
         } = input.as_spanned_string()?;
+        let mut includes = Vec::new();
         let mut transactions = Vec::new();
         for directive in Parser::new(&input) {
             match directive {
@@ -56,12 +57,27 @@ impl nu_plugin::Plugin for NuPlugin {
                 Ok(Directive::Transaction(trx)) => {
                     transactions.push(transaction::record(&trx, input_span));
                 }
+                Ok(Directive::Include(include)) => includes.push(Value::string(
+                    include
+                        .path()
+                        .to_str()
+                        .map(ToOwned::to_owned)
+                        .ok_or_else(|| LabeledError {
+                            label: "Invalid include path".into(),
+                            msg: format!("Cannot convert {:?} to a file path", include.path()),
+                            span: Some(input_span),
+                        })?,
+                    input_span,
+                )),
                 Ok(_) => (),
             }
         }
         Ok(Value::record(
-            vec!["transactions".into()],
-            vec![Value::list(transactions, input_span)],
+            vec!["includes".into(), "transactions".into()],
+            vec![
+                Value::list(includes, input_span),
+                Value::list(transactions, input_span),
+            ],
             call.head,
         ))
     }
@@ -69,6 +85,8 @@ impl nu_plugin::Plugin for NuPlugin {
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use chrono::NaiveDate;
     use nu_plugin::Plugin;
     use nu_protocol::Span;
@@ -154,6 +172,21 @@ mod tests {
         };
         let expected = NaiveDate::from_ymd_opt(2022, 2, 5).unwrap();
         assert_eq!(val.date_naive(), expected);
+    }
+
+    #[test]
+    fn should_return_include_directives() {
+        let input = r#"include "path/to/include/file.beancount""#;
+        let output = from_beancount(input).unwrap();
+        let includes_value = output
+            .get_data_by_key("includes")
+            .expect("no 'includes' in output");
+        let includes = includes_value.as_list().unwrap();
+        assert_eq!(includes.len(), 1);
+        assert_eq!(
+            includes[0].as_path().unwrap(),
+            PathBuf::from("path/to/include/file.beancount"),
+        );
     }
 
     fn from_beancount(input: &str) -> Result<Value, LabeledError> {
