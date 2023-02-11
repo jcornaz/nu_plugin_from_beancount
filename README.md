@@ -1,27 +1,26 @@
 # nu_plugin_from_beancount
 
+[![License](https://img.shields.io/crates/l/nu_plugin_from_beancount)](#Unlicense)
+[![Crates.io](https://img.shields.io/crates/v/nu_plugin_from_beancount)](https://crates.io/crates/nu_plugin_from_beancount)
 ![rustc](https://img.shields.io/badge/rustc-1.62+-blue?logo=rust)
+[![Docs](https://docs.rs/nu_plugin_from_beancount/badge.svg)](https://docs.rs/nu_plugin_from_beancount)
 
 A nushell extension to load a beancount file into nu structured data.
 
-The idea is that in a [nu] shell one could run `bean-example | from beancount` to get a nu-shell structured
-data that could be further transformed and manipulated by the user.
+The idea is that in a [nu] shell one could run `bean-example | from beancount` ot `open myledger.beancount` to get a nushell structured
+table that could be further transformed and manipulated by the user.
 
 [nu]: https://www.nushell.sh/
 
+
 ## Supported Beancount syntax
 
-* [x] Transaction
-  * [x] Flag
-  * [x] Date
-  * [x] Payee
-  * [x] Narration
-  * [x] Postings
-    * [x] Account
-    * [x] Amount
+* [X] Transaction (with postings)
+* [ ] Postings cost
 * [ ] Include directive
 * [ ] Pad directive
 * [ ] Balance assertion
+* [ ] Option
 * [ ] ...
 
 
