@@ -1,4 +1,4 @@
-# rust-template
+# nu_plugin_from_beancount
 
 ![rustc](https://img.shields.io/badge/rustc-1.62+-blue?logo=rust)
 
