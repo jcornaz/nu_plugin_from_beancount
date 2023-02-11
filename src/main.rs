@@ -1,3 +1,13 @@
+#![deny(
+    future_incompatible,
+    nonstandard_style,
+    unsafe_code,
+    private_in_public,
+    unused_results
+)]
+#![warn(rust_2018_idioms, clippy::pedantic)]
+#![cfg_attr(test, allow(clippy::needless_pass_by_value))]
+
 #[cfg(test)]
 #[macro_use]
 extern crate rstest;
@@ -11,7 +21,7 @@ use nu_protocol::{Category, Signature, Span, Spanned, Value};
 use nu_plugin::{serve_plugin, MsgPackSerializer};
 
 fn main() {
-    serve_plugin(&mut NuPlugin, MsgPackSerializer {})
+    serve_plugin(&mut NuPlugin, MsgPackSerializer {});
 }
 
 pub struct NuPlugin;
@@ -35,7 +45,7 @@ impl nu_plugin::Plugin for NuPlugin {
         } = input.as_spanned_string()?;
         let vals = Parser::new(&input)
             .filter_map(|directive| match directive {
-                Ok(directive) => record(directive, input_span).map(Ok),
+                Ok(directive) => record(&directive, input_span).map(Ok),
                 Err(err) => Some(Err(err)),
             })
             .collect::<Result<Vec<Value>, _>>()
@@ -51,7 +61,7 @@ impl nu_plugin::Plugin for NuPlugin {
     }
 }
 
-pub fn record(directive: Directive<'_>, span: Span) -> Option<Value> {
+pub(crate) fn record(directive: &Directive<'_>, span: Span) -> Option<Value> {
     if let Directive::Transaction(trx) = directive {
         Some(transaction::record(trx, span))
     } else {

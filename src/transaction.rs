@@ -5,7 +5,7 @@ use beancount_parser::{
 use chrono::{FixedOffset, NaiveDate, NaiveTime, TimeZone};
 use nu_protocol::{Span, Value};
 
-pub fn record(trx: Transaction<'_>, span: Span) -> Value {
+pub(crate) fn record(trx: &Transaction<'_>, span: Span) -> Value {
     Value::record(
         vec![
             "date".into(),
@@ -72,9 +72,9 @@ fn flag(flag: Option<Flag>, span: Span) -> Value {
 
 fn date(date: Date, span: Span) -> Value {
     let naive = NaiveDate::from_ymd_opt(
-        date.year() as i32,
-        date.month_of_year() as u32,
-        date.day_of_month() as u32,
+        date.year().into(),
+        date.month_of_year().into(),
+        date.day_of_month().into(),
     )
     .expect("The date given by the beancount-parser should be valid")
     .and_time(NaiveTime::default());
@@ -103,7 +103,7 @@ mod tests {
     }
 
     fn parse(raw: &str) -> Value {
-        record(input_trx(raw), Span::unknown())
+        record(&input_trx(raw), Span::unknown())
     }
 
     #[rstest]
