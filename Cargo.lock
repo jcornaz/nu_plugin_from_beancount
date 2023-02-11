@@ -744,8 +744,6 @@ dependencies = [
  "nu-plugin",
  "nu-protocol",
  "rstest",
- "serde",
- "typetag",
 ]
 
 [[package]]

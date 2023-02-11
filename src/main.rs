@@ -13,7 +13,6 @@
 extern crate rstest;
 
 mod transaction;
-mod transaction_v2;
 
 use beancount_parser::{Directive, Parser};
 use nu_plugin::{EvaluatedCall, LabeledError};
