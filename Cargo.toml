@@ -7,8 +7,8 @@ repository = "https://github.com/jcornaz/nu_plugin_from_beancount"
 edition = "2021"
 rust-version = "1.62"
 description = "A nushell extension to load a beancount file into nu structured data"
-categories = []
-keywords = []
+categories = ["Encoding"]
+keywords = ["cli", "accounting", "beancount", "nushell", "nu"]
 
 [dependencies]
 beancount-parser = { version = "1", default-features = false }
