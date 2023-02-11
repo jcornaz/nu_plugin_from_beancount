@@ -10,7 +10,7 @@ verify: test && check-msrv lint
 
 # Watch the source files and run `just verify` when source changes
 watch:
-	cargo watch --delay 0.1 --clear --why -s 'just verify' -s 'cargo deny check'
+	cargo watch --delay 0.1 --clear --why -s 'just test check-msrv lint' -s 'cargo deny check'
 
 # Run the tests
 test:
