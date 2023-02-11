@@ -53,6 +53,10 @@
             {
               "type": "perf",
               "section": "Performance"
+            },
+            {
+              "type": "chore",
+              "section": "Miscellaneous"
             }
           ]
         }
