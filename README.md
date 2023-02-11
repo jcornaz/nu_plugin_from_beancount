@@ -5,10 +5,10 @@
 ![rustc](https://img.shields.io/badge/rustc-1.62+-blue?logo=rust)
 [![Docs](https://docs.rs/nu_plugin_from_beancount/badge.svg)](https://docs.rs/nu_plugin_from_beancount)
 
-A nushell extension to load a beancount file into nu structured data.
+A [nushell] extension to load a beancount file into nu structured data.
 
-When using [nushell] one could run `bean-example | from beancount` ot `open myledger.beancount` to get a nushell structured
-table that can be further transformed and manipulated by the user.
+When using [nushell] one could run `bean-example | from beancount` or `open myledger.beancount` to get a nushell structured
+table that can be further transformed and manipulated.
 
 [nushell]: https://www.nushell.sh/
 
