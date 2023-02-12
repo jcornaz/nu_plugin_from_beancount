@@ -40,9 +40,12 @@ table that can be further transformed and manipulated.
 
 ## Supported Beancount syntax
 
-* [X] Transaction (with postings)
-* [ ] Postings cost
-* [ ] Include directive
+* [x] Transaction
+  * [x] Postings
+    * [x] Account
+    * [x] Amount
+    * [ ] Cost
+* [x] Include directive
 * [ ] Pad directive
 * [ ] Balance assertion
 * [ ] Option
