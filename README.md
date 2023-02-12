@@ -73,7 +73,7 @@ def "bean amount neg" [] {
   transpose currency value | update value { -($in.value) } | transpose -ird
 }
 
-# Complete transactions that are not explitly balanced, so that all transactions balances
+# Complete transactions that are not explitly balanced, so that all transactions balance
 def "bean resolve txn" [] {
   each {|row|
     if $row.directive != "txn" { $row } else {
