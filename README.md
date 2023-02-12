@@ -56,6 +56,39 @@ cargo install nu_plugin_from_beancount
 register ~/.cargo/bin/nu_plugin_from_beancount
 ```
 
+## Companion scripts
+
+Currently, this plugin is intentionally quite dumb and does nothing more than outputing the beancount file content without any transformation or resolution.
+But for most ledgers, the content of the file does not contain all informations required for further analysis.
+For example, the transactions are often not explicitely balanced (one posting has no explicit amount), making it hard to make any useful aggregation of the amounts.
+
+Here are some "companion" scripts that you may find useful when working with `from beancount`.
+
+> **Note**
+> Those scripts are provided here as a suggestion. They are not thoroughy tested, and are not considered part of the plugin API.
+
+```nu
+# Negate a structured amount (which is a record of currencies to values)
+def "bean amount neg" [] {
+  transpose currency value | update value { -($in.value) } | transpose -ird
+}
+
+# Complete transactions that are not explitly balanced, so that all transactions balances
+def "bean resolve txn" [] {
+  each {|row|
+    if $row.directive != "txn" { $row } else {
+      let offset_accounts = ($row.postings | where amount == $nothing | get -i account)
+      if ($offset_accounts | is-empty) { $row } else {
+        let complete_postings = ($row.postings | where amount != $nothing)
+        let offset_account = ($offset_accounts | first)
+        let offset_amount = ($complete_postings | get amount | math sum | bean amount neg)
+        $row | update postings ($complete_postings | append {account: $offset_account, amount: $offset_amount})
+      }
+    }
+  }
+}
+```
+
 
 ## Unlicense
 
