@@ -116,10 +116,8 @@ mod tests {
 
     #[rstest]
     fn all_row_should_have_directive_type(#[values("", BEAN_EXAMPLE)] input: &str) {
-        let output = from_beancount(input).unwrap();
+        let output = from_beancount_success(input);
         assert!(output
-            .as_list()
-            .unwrap()
             .iter()
             .all(|row| { row.get_data_by_key("directive").is_some() }));
     }
@@ -140,8 +138,7 @@ mod tests {
     Expenses:Food    10 CHF
     Assets:Cash
         "#;
-        let output = from_beancount(input).unwrap();
-        let directives = output.as_list().unwrap();
+        let directives = from_beancount_success(input);
         assert_eq!(directives.len(), 1);
         let directive = &directives[0];
         assert_eq!(
@@ -172,8 +169,7 @@ mod tests {
 
     #[rstest]
     fn should_return_date(#[values(r#"2022-02-05 txn"#)] input: &str) {
-        let output = from_beancount(input).unwrap();
-        let directives = output.as_list().unwrap();
+        let directives = from_beancount_success(input);
         assert_eq!(directives.len(), 1);
         let Value::Date { val, .. } = &directives[0].get_data_by_key("date").unwrap() else { 
             panic!("was not a date");
@@ -185,8 +181,7 @@ mod tests {
     #[test]
     fn should_return_include_directives() {
         let input = r#"include "path/to/file.beancount""#;
-        let output = from_beancount(input).unwrap();
-        let directives = output.as_list().unwrap();
+        let directives = from_beancount_success(input);
         assert_eq!(directives.len(), 1);
         assert_eq!(
             &directives[0]
@@ -204,6 +199,14 @@ mod tests {
                 .expect("'path' cannot be converted to path"),
             PathBuf::from("path/to/file.beancount"),
         );
+    }
+
+    fn from_beancount_success(input: &str) -> Vec<Value> {
+        from_beancount(input)
+            .expect("`from beancount` failed")
+            .as_list()
+            .expect("`from beancount` did not return a list")
+            .to_owned()
     }
 
     fn from_beancount(input: &str) -> Result<Value, LabeledError> {
