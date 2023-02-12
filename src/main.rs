@@ -62,15 +62,24 @@ impl nu_plugin::Plugin for NuPlugin {
 }
 
 pub(crate) fn record(directive: &Directive<'_>, span: Span) -> Option<Value> {
-    if let Directive::Transaction(trx) = directive {
-        Some(transaction::record(trx, span))
-    } else {
-        None
+    match directive {
+        Directive::Transaction(trx) => Some(transaction::record(trx, span)),
+        Directive::Include(include) => Some(Value::record(
+            vec!["directive".into(), "path".into()],
+            vec![
+                Value::string("include", span),
+                Value::string(include.path().to_str().unwrap(), span),
+            ],
+            span,
+        )),
+        _ => None,
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use chrono::NaiveDate;
     use nu_plugin::Plugin;
 
@@ -171,6 +180,30 @@ mod tests {
         };
         let expected = NaiveDate::from_ymd_opt(2022, 2, 5).unwrap();
         assert_eq!(val.date_naive(), expected);
+    }
+
+    #[test]
+    fn should_return_include_directives() {
+        let input = r#"include "path/to/file.beancount""#;
+        let output = from_beancount(input).unwrap();
+        let directives = output.as_list().unwrap();
+        assert_eq!(directives.len(), 1);
+        assert_eq!(
+            &directives[0]
+                .get_data_by_key("directive")
+                .expect("no 'directive' field")
+                .as_string()
+                .expect("'directive' is not a string"),
+            "include"
+        );
+        assert_eq!(
+            directives[0]
+                .get_data_by_key("path")
+                .expect("no 'path' field")
+                .as_path()
+                .expect("'path' cannot be converted to path"),
+            PathBuf::from("path/to/file.beancount"),
+        );
     }
 
     fn from_beancount(input: &str) -> Result<Value, LabeledError> {
