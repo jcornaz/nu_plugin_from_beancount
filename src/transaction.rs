@@ -48,7 +48,7 @@ fn posting(posting: &Posting<'_>, span: Span) -> Value {
     )
 }
 
-fn amount(amount: &Amount<'_>, span: Span) -> Value {
+pub(super) fn amount(amount: &Amount<'_>, span: Span) -> Value {
     Value::record(
         vec![amount.currency().into()],
         vec![amount
@@ -70,7 +70,7 @@ fn flag(flag: Option<Flag>, span: Span) -> Value {
     )
 }
 
-fn date(date: Date, span: Span) -> Value {
+pub(super) fn date(date: Date, span: Span) -> Value {
     let naive = NaiveDate::from_ymd_opt(
         date.year().into(),
         date.month_of_year().into(),

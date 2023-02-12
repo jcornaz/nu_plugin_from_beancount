@@ -72,6 +72,21 @@ pub(crate) fn record(directive: &Directive<'_>, span: Span) -> Option<Value> {
             ],
             span,
         )),
+        Directive::Assertion(balance) => Some(Value::record(
+            vec![
+                "directive".into(),
+                "date".into(),
+                "account".into(),
+                "amount".into(),
+            ],
+            vec![
+                Value::string("balance", span),
+                transaction::date(balance.date(), span),
+                Value::string(balance.account().to_string(), span),
+                transaction::amount(balance.amount(), span),
+            ],
+            span,
+        )),
         _ => None,
     }
 }
@@ -80,6 +95,7 @@ pub(crate) fn record(directive: &Directive<'_>, span: Span) -> Option<Value> {
 mod tests {
     use std::path::PathBuf;
 
+    use approx::assert_ulps_eq;
     use chrono::NaiveDate;
     use nu_plugin::Plugin;
 
@@ -198,6 +214,47 @@ mod tests {
                 .as_path()
                 .expect("'path' cannot be converted to path"),
             PathBuf::from("path/to/file.beancount"),
+        );
+    }
+
+    #[test]
+    fn should_return_balance_assertion() {
+        let input = r"2014-12-26 balance Liabilities:US:CreditCard   -3492.02 USD";
+        let directives = from_beancount_success(input);
+        assert_eq!(directives.len(), 1);
+        assert_eq!(
+            &directives[0]
+                .get_data_by_key("directive")
+                .expect("no 'directive' field")
+                .as_string()
+                .expect("'directive' is not a string"),
+            "balance"
+        );
+        let Some(Value::Date { val: date, .. }) = directives[0].get_data_by_key("date") else {
+            panic!("Invalid or absent 'date'");
+        };
+        assert_eq!(
+            date.date_naive(),
+            NaiveDate::from_ymd_opt(2014, 12, 26).unwrap()
+        );
+        assert_eq!(
+            &directives[0]
+                .get_data_by_key("account")
+                .expect("no 'account' field")
+                .as_string()
+                .expect("'account' is not a string"),
+            "Liabilities:US:CreditCard",
+        );
+        let amount = &directives[0]
+            .get_data_by_key("amount")
+            .expect("no 'amount' field");
+        assert_ulps_eq!(
+            amount
+                .get_data_by_key("USD")
+                .expect("no 'USD' key in amount")
+                .as_float()
+                .expect("the amount value is not a number"),
+            -3492.02
         );
     }
 
