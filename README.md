@@ -47,7 +47,7 @@ table that can be further transformed and manipulated.
     * [ ] Cost
 * [x] Include directive
 * [ ] Pad directive
-* [ ] Balance assertion
+* [x] Balance assertion
 * [ ] Option
 * [ ] ...
 
