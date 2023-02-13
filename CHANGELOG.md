@@ -17,10 +17,8 @@
 * **changelog:** curate changlog entry 1.0.0 ([b3b0be5](https://github.com/jcornaz/nu_plugin_from_beancount/commit/b3b0be5dab97af95586ab3e9f9a98353730b83e6))
 * **readme:** add 'bean complete trx' companion script ([ea0da00](https://github.com/jcornaz/nu_plugin_from_beancount/commit/ea0da00caede9e970f9bf15f4d992a8d8f90db54))
 * **readme:** add link to beancount documentation ([141c677](https://github.com/jcornaz/nu_plugin_from_beancount/commit/141c677bbf3067c7434259cb4726ddcfa231bdcc))
-* **readme:** fix a typo ([192395d](https://github.com/jcornaz/nu_plugin_from_beancount/commit/192395d01ecd082ea9e17650ecb2ce272f8cfde0))
 * **readme:** remove badge for docs.rs ([92cf9ee](https://github.com/jcornaz/nu_plugin_from_beancount/commit/92cf9ee65bc2d5d65de187ca71b6c3771da54b13))
-* **readme:** update supported syntax ([f3e7640](https://github.com/jcornaz/nu_plugin_from_beancount/commit/f3e7640ec35e868ea0616015e9d98abd49279228))
-* **readme:** update supported syntax ([b44d6b5](https://github.com/jcornaz/nu_plugin_from_beancount/commit/b44d6b57afcfe7781ee9a57bead1782bd16eed4a))
+
 
 ## 1.0.0 (2023-02-11)
 
