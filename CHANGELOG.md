@@ -1,3 +1,19 @@
+## [2.0.0](https://github.com/jcornaz/nu_plugin_from_beancount/compare/v1.1.0...v2.0.0) (2023-02-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** require nushell 0.76
+
+### Documentation
+
+* **changelog:** curate entry 1.1.0 ([30f9bd5](https://github.com/jcornaz/nu_plugin_from_beancount/commit/30f9bd5fe52de9b44dc377fcc1bce8699185986f))
+
+
+### Miscellaneous
+
+* **deps:** require nushell 0.76 ([90c295d](https://github.com/jcornaz/nu_plugin_from_beancount/commit/90c295df7deadd9a1a8df7484b650c6a6189b9f7))
+
 ## [1.1.0](https://github.com/jcornaz/nu_plugin_from_beancount/compare/v1.0.0...v1.1.0) (2023-02-13)
 
 
