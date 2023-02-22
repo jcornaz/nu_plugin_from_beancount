@@ -16,7 +16,7 @@ mod transaction;
 
 use beancount_parser::{Directive, Parser};
 use nu_plugin::{EvaluatedCall, LabeledError};
-use nu_protocol::{Category, Signature, Span, Spanned, Value};
+use nu_protocol::{Category, PluginSignature, Span, Spanned, Value};
 
 use nu_plugin::{serve_plugin, MsgPackSerializer};
 
@@ -27,8 +27,8 @@ fn main() {
 pub struct NuPlugin;
 
 impl nu_plugin::Plugin for NuPlugin {
-    fn signature(&self) -> Vec<Signature> {
-        vec![Signature::build("from beancount")
+    fn signature(&self) -> Vec<PluginSignature> {
+        vec![PluginSignature::build("from beancount")
             .usage("Convert from beancount to structured data")
             .category(Category::Formats)]
     }
@@ -119,9 +119,9 @@ mod tests {
         let signature = plugin
             .signature()
             .into_iter()
-            .find(|s| &s.name == "from beancount")
+            .find(|s| &s.sig.name == "from beancount")
             .unwrap();
-        assert_eq!(signature.category, Category::Formats);
+        assert_eq!(signature.sig.category, Category::Formats);
     }
 
     #[rstest]
