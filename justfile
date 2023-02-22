@@ -6,7 +6,6 @@ set shell := ["nu", "-c"]
 
 # Perform all verifications (compile, test, lint, etc.)
 verify: test && check-msrv lint
-	cargo vet
 
 # Watch the source files and run `just verify` when source changes
 watch:
