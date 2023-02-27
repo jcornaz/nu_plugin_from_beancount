@@ -82,9 +82,9 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "beancount-parser"
-version = "1.13.0"
+version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e0e681914df399c502c30a4a6cdca95a3e0d3272285f6705443ecf960e15afc0"
+checksum = "810883961b2088cd9de03fb98b7f7ae4034830d92a57c58e64e2b6690b6dfef6"
 dependencies = [
  "nom",
  "rust_decimal",
@@ -1145,9 +1145,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.107"
+version = "1.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f4064b5b16e03ae50984a5a8ed5d4f8803e6bc1fd170a3cda91a1be4b18e3f5"
+checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1169,9 +1169,9 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.28.0"
+version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "727220a596b4ca0af040a07091e49f5c105ec8f2592674339a5bf35be592f76e"
+checksum = "38a81bbc26c485910df47772df6bbcdb417036132caa9e51e29d2e39c4636d4e"
 dependencies = [
  "cfg-if",
  "core-foundation-sys",
