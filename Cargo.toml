@@ -12,7 +12,7 @@ keywords = ["cli", "accounting", "beancount", "nushell", "nu"]
 
 [dependencies]
 beancount-parser = { version = "1", default-features = false }
-nu-plugin = { version = "0.76", default-features = false }
+nu-plugin = { version = "0.77", default-features = false }
 nu-protocol = { version = "0.76", default-features = false, features = ["plugin"] }
 chrono = { version = "0.4", default-features = false, features = ["std"] }
 
