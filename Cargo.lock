@@ -646,8 +646,8 @@ dependencies = [
  "chrono",
  "nu-glob",
  "nu-path",
- "nu-protocol",
- "nu-utils",
+ "nu-protocol 0.76.0",
+ "nu-utils 0.76.0",
  "serde",
  "sysinfo",
 ]
@@ -688,7 +688,7 @@ checksum = "539c7b62216e4b9efb2db66dfbef0581e43ce15e6d83014d6cf3dfeeade30623"
 dependencies = [
  "bincode",
  "nu-engine",
- "nu-protocol",
+ "nu-protocol 0.76.0",
  "rmp",
  "rmp-serde",
  "serde",
@@ -709,7 +709,31 @@ dependencies = [
  "lru",
  "miette",
  "nu-json",
- "nu-utils",
+ "nu-utils 0.76.0",
+ "num-format",
+ "serde",
+ "serde_json",
+ "strum",
+ "strum_macros",
+ "sys-locale",
+ "thiserror",
+ "typetag",
+]
+
+[[package]]
+name = "nu-protocol"
+version = "0.77.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ccd4d31c1dc86e44b1a41bb5edcd9b1d247d7df545ee43d739360bb00cb5ca2b"
+dependencies = [
+ "byte-unit",
+ "chrono",
+ "chrono-humanize",
+ "fancy-regex",
+ "indexmap",
+ "lru",
+ "miette",
+ "nu-utils 0.77.1",
  "num-format",
  "serde",
  "serde_json",
@@ -735,6 +759,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "nu-utils"
+version = "0.77.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "04f4e2b747a7dd41c053e937ebd2fed6a33739788e4ebeb214e556e80dd34993"
+dependencies = [
+ "crossterm_winapi",
+ "log",
+ "lscolors",
+ "num-format",
+ "strip-ansi-escapes",
+ "sys-locale",
+]
+
+[[package]]
 name = "nu_plugin_from_beancount"
 version = "2.0.0"
 dependencies = [
@@ -742,7 +780,7 @@ dependencies = [
  "beancount-parser",
  "chrono",
  "nu-plugin",
- "nu-protocol",
+ "nu-protocol 0.77.1",
  "rstest",
 ]
 
