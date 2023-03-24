@@ -14,6 +14,10 @@
         "dev-dependencies"
       ],
       "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["^nu-"],
+      "groupName": "nushell"
     }
   ]
 }
