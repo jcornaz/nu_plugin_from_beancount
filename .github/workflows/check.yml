@@ -24,6 +24,8 @@ jobs:
         with:
           tool: cargo-hack@0.5,just@1,cargo-msrv@0.15,cargo-deny@0.13,nu@0.76
       - run: just verify
+      - run: cargo build --release
+      - run: nu -c "register target/release/nu_plugin_from_beancount; open src/example.beancount"
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 20
