@@ -5,6 +5,7 @@
     "schedule:weekends",
     ":semanticCommitTypeAll(chore)"
   ],
+  "enabled": false,
   "lockFileMaintenance": {
     "enabled": true
   },
