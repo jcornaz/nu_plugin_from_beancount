@@ -12,6 +12,10 @@ table that can be further transformed and manipulated.
 [nushell]: https://www.nushell.sh/
 [beancount]: https://beancount.github.io/docs/index.html
 
+## Status
+
+This project is discontinued. I have stopped using nushell due to how often the API is broken. I may (or may not) resume this project after nushell is stabilized.
+
 
 ## Example
 
