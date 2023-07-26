@@ -1,6 +1,10 @@
 
 ## [Unreleased]
 
+### Breaking changes
+
+* Require nushell 0.83
+
 ### Dependencies
 
 * Require rust 1.67 or newer to compile from sources
