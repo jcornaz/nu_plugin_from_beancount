@@ -3,7 +3,7 @@
 
 ### Dependencies
 
-* Require rust 1.63 or newer to compile from sources
+* Require rust 1.67 or newer to compile from sources
 
 
 ## [2.0.0](https://github.com/jcornaz/nu_plugin_from_beancount/compare/v1.1.0...v2.0.0) (2023-02-22)
