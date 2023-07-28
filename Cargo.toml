@@ -5,13 +5,14 @@ license = "Unlicense"
 authors = ["Jonathan Cornaz"]
 repository = "https://github.com/jcornaz/nu_plugin_from_beancount"
 edition = "2021"
-rust-version = "1.67"
+rust-version = "1.70"
 description = "A nushell extension to load a beancount file into nu structured data"
 categories = ["Encoding"]
 keywords = ["cli", "accounting", "beancount", "nushell", "nu"]
 
 [dependencies]
 beancount-parser = { version = "1.16.3", default-features = false }
+beancount-parser-2 = { package = "beancount-parser", version = "2.0.0", default-features = false }
 nu-plugin = { version = "0.83.0", default-features = false }
 nu-protocol = { version = "0.83.0", default-features = false, features = ["plugin"] }
 chrono = { version = "0.4.26", default-features = false, features = ["std"] }
