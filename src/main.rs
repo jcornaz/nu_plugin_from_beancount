@@ -107,7 +107,7 @@ mod tests {
         named: Vec::new(),
     };
 
-    const BEAN_EXAMPLE: &str = include_str!("example.beancount");
+    const BEAN_EXAMPLE: &str = include_str!("../example.beancount");
 
     #[fixture]
     fn plugin() -> impl Plugin {
