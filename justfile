@@ -13,7 +13,7 @@ watch:
 
 # Run the tests
 test:
-	cargo hack test --feature-powerset --optional-deps
+	cargo hack test --feature-powerset --optional-deps --locked
 
 # Run the static code analysis
 lint:
