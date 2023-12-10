@@ -1,10 +1,4 @@
-#![deny(
-    future_incompatible,
-    nonstandard_style,
-    unsafe_code,
-    private_in_public,
-    unused_results
-)]
+#![deny(future_incompatible, nonstandard_style, unsafe_code, unused_results)]
 #![warn(rust_2018_idioms, clippy::pedantic)]
 #![cfg_attr(test, allow(clippy::needless_pass_by_value))]
 
@@ -184,10 +178,10 @@ mod tests {
     }
 
     #[rstest]
-    fn should_return_date(#[values(r#"2022-02-05 txn"#)] input: &str) {
+    fn should_return_date(#[values(r"2022-02-05 txn")] input: &str) {
         let directives = from_beancount_success(input);
         assert_eq!(directives.len(), 1);
-        let Value::Date { val, .. } = &directives[0].get_data_by_key("date").unwrap() else { 
+        let Value::Date { val, .. } = &directives[0].get_data_by_key("date").unwrap() else {
             panic!("was not a date");
         };
         let expected = NaiveDate::from_ymd_opt(2022, 2, 5).unwrap();

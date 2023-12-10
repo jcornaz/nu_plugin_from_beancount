@@ -143,9 +143,9 @@ mod tests {
     }
 
     #[rstest]
-    fn should_return_date(#[values(r#"2022-02-05 txn"#)] input: &str) {
+    fn should_return_date(#[values("2022-02-05 txn")] input: &str) {
         let trx = parse(input);
-        let Value::Date { val, .. } = &trx.get_data_by_key("date").unwrap() else { 
+        let Value::Date { val, .. } = &trx.get_data_by_key("date").unwrap() else {
             panic!("was not a date");
         };
         let expected = NaiveDate::from_ymd_opt(2022, 2, 5).unwrap();
