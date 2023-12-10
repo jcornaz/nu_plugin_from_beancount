@@ -16,8 +16,8 @@ status = "experimental"
 [dependencies]
 beancount-parser = { version = "1.16.3", default-features = false }
 beancount-parser-2 = { package = "beancount-parser", version = "2.0.0", default-features = false }
-nu-plugin = { version = "0.83.0", default-features = false }
-nu-protocol = { version = "0.83.0", default-features = false, features = ["plugin"] }
+nu-plugin = { version = "0.84.0", default-features = false }
+nu-protocol = { version = "0.84.0", default-features = false, features = ["plugin"] }
 chrono = { version = "0.4.26", default-features = false, features = ["std"] }
 
 [dev-dependencies]
